@@ -40,11 +40,11 @@
   </node>
 
   <!-- servo node -->
-  <node pkg="racecar_control" type="servo_commands.py" name="servo_commands_racecar2" output="screen">
+  <node pkg="racecar_control" type="servo_commands2.py" name="servo_commands_racecar2" output="screen">
     <remap from="/racecar2/ackermann_cmd_mux/output" to="/vesc2/low_level/ackermann_cmd_mux/output"/>
   </node>
 
   <!-- Allow for Gazebo to broadcast odom -->
-  <node pkg="racecar_gazebo" name="gazebo_odometry_node_racecar2" type="gazebo_odometry.py"/>
+  <node pkg="racecar_gazebo" name="gazebo_odometry_node_racecar2" type="gazebo_odometry2.py"/>
 
 </launch>
