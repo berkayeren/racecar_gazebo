@@ -1,7 +1,5 @@
-<?xml version='1.0'?>
-
+<?xml version="1.0"?>
 <launch>
-
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find racecar_control)/config/racecar_control.yaml" command="load"/>
 
@@ -13,17 +11,17 @@
                                             left_steering_hinge_position_controller right_steering_hinge_position_controller
                                             joint_state_controller"/>
 
-  <!-- convert joint states to TF transforms for rviz, etc -->
+  <!-- First racecar state publisher -->
   <node name="robot_state_publisher_racecar" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
     <remap from="/joint_states" to="/racecar/joint_states" />
   </node>
 
-  <!-- servo node -->
+  <!-- First racecar servo node -->
   <node pkg="racecar_control" type="servo_commands.py" name="servo_commands_racecar" output="screen">
     <remap from="/racecar/ackermann_cmd_mux/output" to="/vesc/low_level/ackermann_cmd_mux/output"/>
   </node>
 
-  <!-- Allow for Gazebo to broadcast odom -->
+  <!-- First racecar odometry node -->
   <node pkg="racecar_gazebo" name="gazebo_odometry_node_racecar" type="gazebo_odometry.py"/>
 
   <!-- Second racecar -->
@@ -34,17 +32,16 @@
                                             left_steering_hinge_position_controller right_steering_hinge_position_controller
                                             joint_state_controller"/>
 
-  <!-- convert joint states to TF transforms for rviz, etc -->
+  <!-- Second racecar state publisher -->
   <node name="robot_state_publisher_racecar2" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
     <remap from="/joint_states" to="/racecar2/joint_states" />
   </node>
 
-  <!-- servo node -->
+  <!-- Second racecar servo node -->
   <node pkg="racecar_control" type="servo_commands2.py" name="servo_commands_racecar2" output="screen">
     <remap from="/racecar2/ackermann_cmd_mux/output" to="/vesc2/low_level/ackermann_cmd_mux/output"/>
   </node>
 
-  <!-- Allow for Gazebo to broadcast odom -->
+  <!-- Second racecar odometry node -->
   <node pkg="racecar_gazebo" name="gazebo_odometry_node_racecar2" type="gazebo_odometry2.py"/>
-
 </launch>

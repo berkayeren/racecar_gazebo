@@ -10,7 +10,7 @@
     <arg name="gui" value="$(arg gui)"/>
   </include>
 
-  <!-- Load the robot description for both cars -->
+  <!-- Load the robot description -->
   <param name="robot_description" command="$(find xacro)/xacro '$(find racecar_description)/urdf/racecar.xacro'" />
 
   <!-- Spawn the first racecar in Gazebo -->
@@ -19,29 +19,28 @@
   <!-- ros_control for the first racecar -->
   <include file="$(find racecar_control)/launch/racecar_control.launch" ns="/racecar"/>
 
-  <!-- Spawn the MUX for the first racecar -->
-  <arg name="racecar_version" default="racecar-v2" />
+  <!-- MUX for the first racecar -->
   <include file="$(find racecar)/launch/mux.launch" ns="vesc" />
 
-  <!-- Publish "better odom" topic for the first racecar -->
-  <node name="better_odom" pkg="topic_tools" type="relay" args="/vesc/odom /pf/pose/odom" />
+  <!-- Better odom topic for the first racecar -->
+  <node name="better_odom_racecar" pkg="topic_tools" type="relay" args="/vesc/odom /pf/pose/odom" />
 
   <!-- Spawn the second racecar in Gazebo -->
   <node name="racecar2_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model racecar2 -x -1 -z 0.05" />
 
-  <!-- ros_control for the second racecar -->
+  <!-- ros_control launch file for the second racecar -->
   <include file="$(find racecar_control)/launch/racecar_control.launch" ns="/racecar2"/>
 
-  <!-- Spawn the MUX for the second racecar -->
+  <!-- MUX for the second racecar -->
   <include file="$(find racecar)/launch/mux.launch" ns="vesc2" />
 
-  <!-- Publish "better odom" topic for the second racecar -->
-  <node name="better_odom_2" pkg="topic_tools" type="relay" args="/vesc2/odom /pf/pose/odom" />
+  <!-- Better odom topic for the second racecar -->
+  <node name="better_odom_racecar2" pkg="topic_tools" type="relay" args="/vesc2/odom /pf/pose/odom" />
 
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find racecar_control)/config/racecar_control.yaml" command="load"/>
 
-  <!-- Start the ackermann_cmd_mux node -->
+  <!-- ackermann_cmd_mux node -->
   <node pkg="ackermann_cmd_mux" type="ackermann_cmd_mux" name="ackermann_cmd_mux" output="screen" />
 
   <!-- Servo node for the first racecar -->
@@ -50,14 +49,13 @@
   </node>
 
   <!-- Servo node for the second racecar -->
-  <node pkg="racecar_control" type="servo_commands2.py" name="servo_commands_racecar2" output="screen">
+  <node pkg="racecar_control" type="servo_commands.py" name="servo_commands_racecar2" output="screen">
     <remap from="/racecar2/ackermann_cmd_mux/output" to="/vesc2/low_level/ackermann_cmd_mux/output"/>
   </node>
 
-  <!-- Allow Gazebo to broadcast odom for the first racecar -->
+  <!-- Gazebo odometry node for the first racecar -->
   <node pkg="racecar_gazebo" name="gazebo_odometry_node_racecar" type="gazebo_odometry.py"/>
 
-  <!-- Allow Gazebo to broadcast odom for the second racecar -->
+  <!-- Gazebo odometry node for the second racecar -->
   <node pkg="racecar_gazebo" name="gazebo_odometry_node_racecar2" type="gazebo_odometry2.py"/>
-
 </launch>
