@@ -12,6 +12,8 @@
 
   <!-- Load the robot description -->
   <param name="robot_description" command="$(find xacro)/xacro '$(find racecar_description)/urdf/racecar.xacro'" />
+  <!-- Load the robot description -->
+  <param name="robot_description2" command="$(find xacro)/xacro '$(find racecar_description2)/urdf/racecar.xacro'" />
 
   <!-- Spawn the first racecar in Gazebo -->
   <node name="racecar_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model racecar -z 0.05" />
@@ -26,7 +28,7 @@
   <node name="better_odom_racecar" pkg="topic_tools" type="relay" args="/vesc/odom /pf/pose/odom" />
 
   <!-- Spawn the second racecar in Gazebo -->
-  <node name="racecar2_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model racecar2 -x -1 -z 0.05" />
+  <node name="racecar2_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description2 -model racecar2 -x -1 -z 0.05" />
 
   <!-- ros_control launch file for the second racecar -->
   <include file="$(find racecar_control)/launch/racecar_control2.launch" ns="/racecar2"/>

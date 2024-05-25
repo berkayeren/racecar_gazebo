@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>racecar_gazebo</name>
+  <name>racecar_description2</name>
   <version>0.0.0</version>
-  <description>The racecar_gazebo package</description>
+  <description>The racecar_description2 package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/racecar_gazebo</url> -->
+  <!-- <url type="website">http://wiki.ros.org/racecar_description2</url> -->
 
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
@@ -40,17 +40,10 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>gazebo_ros</build_depend>
-  <run_depend>gazebo_ros</run_depend>
-  <run_depend>controller_manager</run_depend>
-  <run_depend>ros_controllers</run_depend>
-  <run_depend>ros_control</run_depend>
-  <run_depend>gazebo_ros_control</run_depend>
-  <run_depend>gazebo_ros_control2</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <gazebo_ros gazebo_model_path="${prefix}/.." />
+        
   </export>
 </package>
