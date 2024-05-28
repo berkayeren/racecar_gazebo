@@ -4,6 +4,7 @@ from sensor_msgs.msg import LaserScan
 from ackermann_msgs.msg import AckermannDriveStamped
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
+import tf
 import numpy as np
 import math
 
@@ -45,6 +46,8 @@ class AutonomousRacecar:
         self.state = 'DRIVING'
         self.state_start_time = rospy.get_time()
         self.stuck_start_time = None
+        # TF broadcaster
+        self.br = tf.TransformBroadcaster()
 
     def odom_callback(self, odom):
         orientation_q = odom.pose.pose.orientation
@@ -52,8 +55,17 @@ class AutonomousRacecar:
         _, _, yaw = euler_from_quaternion(orientation_list)
         self.current_yaw = yaw
 
-        # Track position to detect if stuck
+        # Broadcast the transformation
         position = odom.pose.pose.position
+        self.br.sendTransform(
+            (position.x, position.y, 0),
+            (orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w),
+            rospy.Time.now(),
+            "leader_car",
+            "world"
+        )
+
+        # Track position to detect if stuck
         if self.last_position is None:
             self.last_position = position
         else:
