@@ -4,13 +4,16 @@ from sensor_msgs.msg import LaserScan
 from ackermann_msgs.msg import AckermannDriveStamped
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
-import tf
+from geometry_msgs.msg import TransformStamped, Transform, Quaternion
+from std_msgs.msg import Header
+import tf2_ros
 import numpy as np
 import math
 
 
 class AutonomousRacecar:
     def __init__(self):
+        self.position = None
         rospy.init_node('autonomous_racecar', anonymous=True)
         self.drive_pub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/teleop', AckermannDriveStamped, queue_size=10)
         rospy.Subscriber('/scan', LaserScan, self.scan_callback)
@@ -47,7 +50,7 @@ class AutonomousRacecar:
         self.state_start_time = rospy.get_time()
         self.stuck_start_time = None
         # TF broadcaster
-        self.br = tf.TransformBroadcaster()
+        self.br = tf2_ros.TransformBroadcaster()
 
     def odom_callback(self, odom):
         orientation_q = odom.pose.pose.orientation
@@ -56,27 +59,39 @@ class AutonomousRacecar:
         self.current_yaw = yaw
 
         # Broadcast the transformation
-        position = odom.pose.pose.position
-        self.br.sendTransform(
-            (position.x, position.y, 0),
-            (orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w),
-            rospy.Time.now(),
-            "leader_car",
-            "world"
+        self.position = odom.pose.pose.position
+        orientation_q = odom.pose.pose.orientation
+
+        tf = TransformStamped(
+            header=Header(
+                frame_id="world",
+                stamp=rospy.Time.now()
+            ),
+            child_frame_id="leader_car",
+            transform=Transform(
+                translation=self.position,
+                rotation=Quaternion(
+                    x=orientation_q.x,
+                    y=orientation_q.y,
+                    z=orientation_q.z,
+                    w=orientation_q.w
+                )
+            )
         )
+        self.br.sendTransform(tf)
 
         # Track position to detect if stuck
         if self.last_position is None:
-            self.last_position = position
+            self.last_position = self.position
         else:
             distance_moved = np.sqrt(
-                (position.x - self.last_position.x) ** 2 + (position.y - self.last_position.y) ** 2)
+                (self.position.x - self.last_position.x) ** 2 + (self.position.y - self.last_position.y) ** 2)
             if distance_moved < self.position_stuck_threshold:
                 if self.stuck_start_time is None:
                     self.stuck_start_time = rospy.get_time()
             else:
                 self.stuck_start_time = None
-            self.last_position = position
+            self.last_position = self.position
 
         # Calculate current speed
         self.current_speed = np.sqrt(odom.twist.twist.linear.x ** 2 + odom.twist.twist.linear.y ** 2)
